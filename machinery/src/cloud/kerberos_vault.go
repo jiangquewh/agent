@@ -35,8 +35,13 @@ func UploadKerberosVault(configuration *models.Configuration, fileName string) (
 	// This can happen when the file was already removed (e.g. cleanup, or an
 	// earlier successful upload). Skip it so the watcher drops the marker
 	// instead of retrying indefinitely.
-	if _, err := os.Stat("data/recordings/" + fileName); err != nil {
+	info, err := os.Stat("data/recordings/" + fileName)
+	if err != nil {
 		log.Log.Info("UploadKerberosVault: skipping " + fileName + ", file doesn't exist anymore")
+		return false, false, nil
+	}
+	if info.Size() == 0 {
+		log.Log.Warning("UploadKerberosVault: skipping " + fileName + ", recording is empty")
 		return false, false, nil
 	}
 
