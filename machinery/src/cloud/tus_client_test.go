@@ -264,6 +264,36 @@ func testVault(uri string) models.KStorage {
 	}
 }
 
+func TestUploadKerberosVaultSkipsEmptyRecording(t *testing.T) {
+	fileName := "1787015373_3-654_office-camera17_0-0-0-0_-1_1960.mp4"
+	withRecording(t, fileName, nil)
+
+	requestCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	vault := testVault(server.URL)
+	configuration := &models.Configuration{Config: models.Config{
+		Key:               "device-key",
+		KStorage:          &vault,
+		KStorageSecondary: &models.KStorage{},
+	}}
+
+	uploaded, configured, err := UploadKerberosVault(configuration, fileName)
+	if err != nil {
+		t.Fatalf("UploadKerberosVault() error = %v", err)
+	}
+	if uploaded || configured {
+		t.Fatalf("UploadKerberosVault() uploaded/configured = %v/%v, want false/false", uploaded, configured)
+	}
+	if requestCount != 0 {
+		t.Fatalf("Vault received %d requests, want 0", requestCount)
+	}
+}
+
 func TestUploadVaultResumable_HappyPath(t *testing.T) {
 	srv := newFakeTus()
 	ts := httptest.NewServer(srv)
