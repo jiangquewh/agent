@@ -173,6 +173,7 @@ func RunAgent(configDirectory string, configuration *models.Configuration, commu
 
 	// Get the video stream from the RTSP server.
 	videoStream := videoStreams[0]
+	log.Log.Info(fmt.Sprintf("components.Kerberos.RunAgent(): detected main video stream: codec=%s resolution=%dx%d fps=%.2f", videoStream.Name, videoStream.Width, videoStream.Height, videoStream.FPS))
 
 	// Get some information from the video stream.
 	width := videoStream.Width
@@ -234,6 +235,7 @@ func RunAgent(configDirectory string, configuration *models.Configuration, commu
 
 		// Get the video stream from the RTSP server.
 		videoSubStream := videoSubStreams[0]
+		log.Log.Info(fmt.Sprintf("components.Kerberos.RunAgent(): detected sub video stream: codec=%s resolution=%dx%d fps=%.2f", videoSubStream.Name, videoSubStream.Width, videoSubStream.Height, videoSubStream.FPS))
 
 		width := videoSubStream.Width
 		height := videoSubStream.Height
